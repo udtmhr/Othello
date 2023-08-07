@@ -13,7 +13,7 @@ class Com:
                               [45, -11, 4, -1, -1, 4, -11, 45]],
                               dtype=int)
     
-    def __init__(self, board, d=3, color = WHITE):
+    def __init__(self, board, d=3):
         self.d = d
         self.board = board
     
