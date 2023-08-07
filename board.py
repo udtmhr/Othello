@@ -100,53 +100,36 @@ class Board:
         反転する場所を取得する
         """
         
-        blank = self.blank()
-        mask = self.horizontal & self.ob
+        ob = self.horizontal & self.ob
 
-        #右
-        line = self.check_line(self.pb, mask, self.lshift, 1)
-        legal = blank & self.lshift(line, 1)
-        res = self.check_line(pos & legal, self.ob, self.rshift, 1)
+        #左に返る石を求める
+        res = self.check_line(pos, ob, self.lshift, 1)
         
 
-        #左
-        line = self.check_line(self.pb, mask, self.rshift, 1)
-        legal = blank & self.rshift(line, 1)
-        res |= self.check_line(pos & legal, self.ob, self.lshift, 1)
+        #右に返る石を求める
+        res |= self.check_line(pos, ob, self.rshift, 1)
         
-        mask = self.vertical & self.ob
+        ob = self.vertical & self.ob
 
-        #下
-        line = self.check_line(self.pb, mask, self.lshift, 8)
-        legal = blank & self.lshift(line, 8)
-        res |= self.check_line(pos & legal, self.ob, self.rshift, 8)
+        #上に返る石を求める
+        res |= self.check_line(pos, ob, self.lshift, 8)
         
-        #上
-        line = self.check_line(self.pb, mask, self.rshift, 8)
-        legal = blank & self.rshift(line, 8)
-        res |= self.check_line(pos & legal, self.ob, self.lshift, 8)
+        #下に返る石を求める
+        res |= self.check_line(pos, ob, self.rshift, 8)
 
-        mask = self.diagonal & self.ob
+        ob= self.diagonal & self.ob
 
-        #左上
-        line = self.check_line(self.pb, mask, self.rshift, 9)
-        legal = blank & self.rshift(line, 9)
-        res |= self.check_line(pos & legal, self.ob, self.lshift, 9)
+        #左上に返る石を求める
+        res |= self.check_line(pos, ob, self.lshift, 9)
 
-        #左下
-        line = self.check_line(self.pb, mask, self.lshift, 7)
-        legal = blank & self.lshift(line, 7)
-        res |= self.check_line(pos & legal, self.ob, self.rshift, 7)
+        #左下に返る石を求める
+        res |= self.check_line(pos, ob, self.rshift, 7)
 
-        #右上
-        line = self.check_line(self.pb, mask, self.rshift, 7)
-        legal = blank & self.rshift(line, 7)
-        res |= self.check_line(pos & legal, self.ob, self.lshift, 7)
+        #右上に返る石を求める
+        res |= self.check_line(pos, ob, self.lshift, 7)
         
-        #右下
-        line = self.check_line(self.pb, mask, self.lshift, 9)
-        legal = blank & self.lshift(line, 9)
-        res |= self.check_line(pos & legal, self.ob, self.rshift, 9)
+        #右下に返る石を求める
+        res |= self.check_line(pos, ob, self.rshift, 9)
         
         return res
     
