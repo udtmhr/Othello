@@ -1,5 +1,4 @@
 import numpy as np
-from board import Board
 from globalvar import SIZE, EMPTY, WHITE, BLACK
 
 class Com:
@@ -23,7 +22,7 @@ class Com:
         位置による評価の合計を返す
         """
 
-        board_arr = np.array(list(format(self.board.pb, "064b")), dtype=int)
+        board_arr = np.array(list(bin(self.board.pb)[2:].zfill(64)), dtype=int)
         board_arr = np.reshape(board_arr, (SIZE, SIZE))
         return np.sum(board_arr * Com.eval_board * 3)
     
@@ -114,14 +113,15 @@ class Com:
         return Com.weight[0] * bp + Com.weight[1] * sd + Com.weight[2] * cn
     
     def final_eval(self):
-        return (self.board.pb.bit_count() - self.board.ob.bit_count()) * 100 * -self.board.turn
+        return (self.board.pb.bit_count() - self.board.ob.bit_count()) * 100
     
     def nega_alpha(self, depth, alpha, beta):
-        olb = self.board.legal_board(self.board.ob, self.board.pb)
-        plb = self.board.legal_board(self.board.pb, self.board.ob)
         if depth == 0:
             return self.mid_eval()
         
+        olb = self.board.legal_board(self.board.ob, self.board.pb)
+        plb = self.board.legal_board(self.board.pb, self.board.ob)
+
         if not plb | olb:
             return self.final_eval()
         
@@ -164,7 +164,8 @@ class Com:
         return best_pos
 
 if __name__ == "__main__":
+    from board import Board
     board = Board()
-    com = Com(board)
-    com.nega_alpha(1)
-    print(format(board.pb, "016x"))
+    arr = np.array(list(bin(board.pb)[2:].zfill(64)), dtype=int)
+    print(arr)
+    
