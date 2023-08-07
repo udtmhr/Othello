@@ -14,15 +14,13 @@ class Othello():
         super().__init__()
         self.board = Board()
         self.com = Com(self.board)
-        self.black = 2
-        self.white = 2
+
         self.create_root()
         self.create_menu()
         self.create_canvas()
         self.create_widget()
         self.init_board()
 
-        self.suport()
         self.event()
 
     def create_root(self):
@@ -110,17 +108,21 @@ class Othello():
     def init_board(self):
         mass_size = CANVAS_SIZE / SIZE
         for i in range(SIZE * SIZE):
-            y = i // SIZE
-            x = i - y * SIZE
-            h = y * mass_size
-            w = x * mass_size
-            self.canvas.create_rectangle(w, h, w + mass_size, h + mass_size, fill="green", tags=f"mass_{i}", outline="black") 
-            if (i == 28 or i == 35):
-                self.draw_stone(i, "black")
-            elif (i == 27 or i == 36):
-                self.draw_stone(i, "white")
+            h = i // SIZE
+            w = i - h * SIZE
+            h = h * mass_size
+            w = w * mass_size
+            self.canvas.create_rectangle(w, h, w + mass_size, h + mass_size, fill="green", tags=f"mass_{i}", outline="black")
+            if i == 19 or i == 26 or i == 37 or i == 44:
+                self.canvas.itemconfig(f"mass_{i}", fill="spring green", stipple="gray25")
+            self.canvas.create_oval(w, h, w + mass_size, h + mass_size, fill="black", tags=f"stone_{i}", width=0) 
+            self.canvas.scale(f"stone_{i}", w + mass_size / 2, h + mass_size / 2, 0.8, 0.8 )
+            if i == 27 or i == 36:
+                self.canvas.itemconfig(f"stone_{i}", fill="white")
+            elif i != 28 and i != 35:
+                self.canvas.itemconfig(f"stone_{i}", state=tk.HIDDEN)     
        
-    def make_board(self):
+    def disp_board(self):
         mass_size = CANVAS_SIZE / SIZE
         legal = self.board.legal_board(self.board.ob, self.board.pb)
         for i in range(SIZE * SIZE):
@@ -130,19 +132,9 @@ class Othello():
                 self.canvas.itemconfig(f"mass_{i}", fill="green")
             pcolor, ocolor = ("black", "white") if self.board.turn == BLACK else ("white", "black")
             if self.board.pb & (0x8000000000000000 >> i):
-                self.draw_stone(i, pcolor)
+                self.canvas.itemconfig(f"stone_{i}", fill=pcolor, state=tk.NORMAL)
             elif self.board.ob & (0x8000000000000000 >> i):
-                self.draw_stone(i,  ocolor)
-    
-    def draw_stone(self, i, color):
-        mass_size = CANVAS_SIZE / SIZE
-        tag = f"stone_{i}"
-        y = i // SIZE
-        x = i - y * SIZE
-        x *= mass_size
-        y *= mass_size
-        self.canvas.create_oval(x, y, x + mass_size, y + mass_size, fill=color, tags=tag, width=0)
-        self.canvas.scale(tag, x + mass_size / 2, y + mass_size / 2, 0.8, 0.8 )
+                self.canvas.itemconfig(f"stone_{i}", fill=ocolor, state=tk.NORMAL)
     
     def next_player(self):
         if (next := self.board.next_player()) == 0:
@@ -167,7 +159,7 @@ class Othello():
         )
     
     def change_disp(self):
-        self.make_board()
+        self.disp_board()
         self.black_var.set(f"黒:{self.black}")
         self.white_var.set(f"白:{self.white}")
         self.next_player()
@@ -207,7 +199,7 @@ class Othello():
         self.canvas.bind("<Button-1>", self.click)
     
     def rematch(self):
-        pass
+        self
 
 
 if __name__ == "__main__":
