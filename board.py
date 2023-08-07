@@ -1,12 +1,15 @@
 from globalvar import *
 
 class Board:
-    def __init__(self):
+    def __init__(self, color):
         self.pb = INIT_BLACK_BOARD            # 打ちての盤面
         self.ob = INIT_WHITE_BOARD            # 相手の盤面
         self.turn = BLACK                     # 手番
-        self.black = 2                        # 黒の石の数
-        self.white = 2                        # 白の石の数
+        self.player_score = 2                 # プレイヤーの石の数
+        self.com_score = 2                    # コンピュータの石の数
+        self.player_color = color             # プレイヤーの色
+        self.com_color = color * -1           # コンピュータの色
+        self.pre_pos = 0                      #　前回の手
    
     def init(self):
         self.pb = INIT_BLACK_BOARD            # 打ちての盤面
@@ -122,12 +125,14 @@ class Board:
         legal = blank_board & self.lshift(legal, 8)
         res |= self.check_line(pos & legal, ob, self.rshift, 8)
 
-        ob     #左上に返る石を求める
+        ob = 0x007e7e7e7e7e7e00 & self.ob
+        
+        #左上に返る石を求める
         legal = self.check_line(self.pb, ob, self.rshift, 9)
         legal = blank_board & self.rshift(legal, 9)
         res |= self.check_line(pos & legal, ob, self.lshift, 9)
 
-        #
+        #左上に返る石を求める
         legal = self.check_line(self.pb, ob, self.lshift, 7)
         legal = blank_board & self.lshift(legal, 7)
         res |= self.check_line(pos & legal, ob, self.rshift, 7)
