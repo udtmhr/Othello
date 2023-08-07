@@ -1,19 +1,16 @@
-from globalvar import SIZE, EMPTY, WHITE, BLACK
+from globalvar import *
 
 class Board:
     def __init__(self):
-        self.pb = 0x0000000810000000          # 打ちての盤面
-        self.ob = 0x0000001008000000          # 相手の盤面
+        self.pb = INIT_BLACK_BOARD            # 打ちての盤面
+        self.ob = INIT_WHITE_BOARD            # 相手の盤面
         self.turn = BLACK                     # 手番
         self.black = 2                        # 黒の石の数
         self.white = 2                        # 白の石の数
-        self.vertical = 0x00FFFFFFFFFFFF00    # 上下の壁
-        self.horizontal = 0x7e7e7e7e7e7e7e7e  # 左右の壁
-        self.diagonal = 0x007e7e7e7e7e7e00    # 全辺の壁
-    
-    def init_board(self):
-        self.pb = 0x0000000810000000          # 打ちての盤面
-        self.ob = 0x0000001008000000          # 相手の盤面
+   
+    def init(self):
+        self.pb = INIT_BLACK_BOARD            # 打ちての盤面
+        self.ob = INIT_WHITE_BOARD            # 相手の盤面
         self.turn = BLACK                     # 手番
         self.black = 2                        # 黒の石の数
         self.white = 2                        # 白の石の数
@@ -55,7 +52,7 @@ class Board:
 
         blank_board = self.blank()   # 空きマスが１のボード
         
-        mask = self.horizontal & ob  # 左右の番人
+        mask = 0x7e7e7e7e7e7e7e7e & ob  # 左右の番人
 
         #左
         res = self.check_line(pb, mask, self.lshift, 1)
@@ -65,7 +62,7 @@ class Board:
         res = self.check_line(pb, mask, self.rshift, 1)
         legal_board |=  self.rshift(res, 1)  
 
-        mask = self.vertical & ob    # 上下の番人
+        mask = 0x00FFFFFFFFFFFF00 & ob    # 上下の番人
 
         #下
         res = self.check_line(pb, mask, self.rshift, 8)
@@ -75,7 +72,7 @@ class Board:
         res = self.check_line(pb, mask, self.lshift, 8)
         legal_board |= self.lshift(res, 8)
 
-        mask = self.diagonal & ob    # 全辺の番人
+        mask = ob & 0x007e7e7e7e7e7e00    #  全辺の番人
 
         #左上
         res = self.check_line(pb, mask, self.lshift, 9)
@@ -100,7 +97,7 @@ class Board:
         反転する場所を取得する
         """
         blank_board = self.blank()
-        ob = self.horizontal & self.ob
+        ob = 0x7e7e7e7e7e7e7e7e & self.ob
 
         #左に返る石を求める
         legal = self.check_line(self.pb, ob, self.rshift, 1)
@@ -113,7 +110,7 @@ class Board:
         legal = blank_board& self.lshift(legal, 1)
         res |= self.check_line(pos & legal, ob, self.rshift, 1)
         
-        ob = self.vertical & self.ob
+        ob = 0x00FFFFFFFFFFFF00 & self.ob
 
         #上に返る石を求める
         legal = self.check_line(self.pb, ob, self.rshift, 8)
@@ -125,9 +122,7 @@ class Board:
         legal = blank_board & self.lshift(legal, 8)
         res |= self.check_line(pos & legal, ob, self.rshift, 8)
 
-        ob= self.diagonal & self.ob
-
-        #左上に返る石を求める
+        ob     #左上に返る石を求める
         legal = self.check_line(self.pb, ob, self.rshift, 9)
         legal = blank_board & self.rshift(legal, 9)
         res |= self.check_line(pos & legal, ob, self.lshift, 9)
