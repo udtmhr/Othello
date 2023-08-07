@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from board import Board
 from computer import Com
-from globalvar import SIZE, EMPTY, WHITE, BLACK
+from globalvar import *
 
 WIDTH = 840
 HEIGHT = 640
@@ -100,27 +100,31 @@ class Othello():
         re = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="難易度", menu=diff)
         menu.add_cascade(label="再戦", menu=re)
-        re.add_command(label="再戦", command=self.rematch())
+        re.add_command(label="再戦", command=self.rematch)
         diff.add_radiobutton(label="簡単", command=lambda : self.select_com(1))
         diff.add_radiobutton(label="普通", command=lambda : self.select_com(3))
         diff.add_radiobutton(label="難しい", command=lambda : self.select_com(6))
     
+    def select_color(self, color):
+        self.player_color = color
+        self.com_color = color * -1
+
     def init_board(self):
         mass_size = CANVAS_SIZE / SIZE
         for i in range(SIZE * SIZE):
             h = i // SIZE
             w = i - h * SIZE
-            h = h * mass_size
-            w = w * mass_size
+            h *= mass_size
+            w *= mass_size
             self.canvas.create_rectangle(w, h, w + mass_size, h + mass_size, fill="green", tags=f"mass_{i}", outline="black")
             if i == 19 or i == 26 or i == 37 or i == 44:
                 self.canvas.itemconfig(f"mass_{i}", fill="spring green", stipple="gray25")
-            self.canvas.create_oval(w, h, w + mass_size, h + mass_size, fill="black", tags=f"stone_{i}", width=0) 
+            self.canvas.create_oval(w, h, w + mass_size, h + mass_size, fill="black", tags=f"stone_{i}", width=0, state=tk.HIDDEN) 
             self.canvas.scale(f"stone_{i}", w + mass_size / 2, h + mass_size / 2, 0.8, 0.8 )
             if i == 27 or i == 36:
-                self.canvas.itemconfig(f"stone_{i}", fill="white")
-            elif i != 28 and i != 35:
-                self.canvas.itemconfig(f"stone_{i}", state=tk.HIDDEN)     
+                self.canvas.itemconfig(f"stone_{i}", fill="white", state=tk.NORMAL)
+            elif i == 28 or i == 35:
+                self.canvas.itemconfig(f"stone_{i}", state=tk.NORMAL)     
        
     def disp_board(self):
         mass_size = CANVAS_SIZE / SIZE
@@ -160,8 +164,8 @@ class Othello():
     
     def change_disp(self):
         self.disp_board()
-        self.black_var.set(f"黒:{self.black}")
-        self.white_var.set(f"白:{self.white}")
+        self.black_var.set(f"黒:{self.board.black}")
+        self.white_var.set(f"白:{self.board.white}")
         self.next_player()
         turn = "黒" if self.board.turn == BLACK else "白"
         self.turn_var.set(f"{turn}の手番")
@@ -173,8 +177,8 @@ class Othello():
         pos = self.com.search(self.com.d)
         rev = self.board.reverse(pos)
         self.board.put(pos, rev)
-        self.white = self.board.pb.bit_count()
-        self.black = self.board.ob.bit_count()
+        self.board.white = self.board.pb.bit_count()
+        self.board.black = self.board.ob.bit_count()
         self.change_disp()
 
         if self.board.turn == WHITE:
@@ -188,8 +192,8 @@ class Othello():
         if self.board.check_put(pos):
             rev = self.board.reverse(pos)
             self.board.put(pos, rev)
-            self.black = self.board.pb.bit_count()
-            self.white = self.board.ob.bit_count()
+            self.board.black = self.board.pb.bit_count()
+            self.board.white = self.board.ob.bit_count()
             self.change_disp()
 
         if self.board.turn == WHITE:
@@ -199,7 +203,18 @@ class Othello():
         self.canvas.bind("<Button-1>", self.click)
     
     def rematch(self):
-        self
+        self.board.init()
+        for i in range(SIZE * SIZE):
+            self.canvas.itemconfig(f"stone_{i}", fill="black", state=tk.HIDDEN)
+            if i == 19 or i == 26 or i == 37 or i == 44:
+                self.canvas.itemconfig(f"mass_{i}", fill="spring green", stipple="gray25")
+            elif i == 27 or i == 36:
+                self.canvas.itemconfig(f"stone_{i}", fill="white", state=tk.NORMAL)
+            elif i == 28 or i == 35:
+                self.canvas.itemconfig(f"stone_{i}", state=tk.NORMAL) 
+            else:
+                self.canvas.itemconfig(f"mass_{i}", fill="green")
+
 
 
 if __name__ == "__main__":
