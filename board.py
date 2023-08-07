@@ -99,37 +99,53 @@ class Board:
         """
         反転する場所を取得する
         """
-        
+        blank_board = self.blank()
         ob = self.horizontal & self.ob
 
         #左に返る石を求める
-        res = self.check_line(pos, ob, self.lshift, 1)
+        legal = self.check_line(self.pb, ob, self.rshift, 1)
+        legal = blank_board & self.rshift(legal, 1)
+        res = self.check_line(pos & legal, ob, self.lshift, 1)
         
 
         #右に返る石を求める
-        res |= self.check_line(pos, ob, self.rshift, 1)
+        legal = self.check_line(self.pb, ob, self.lshift, 1)
+        legal = blank_board& self.lshift(legal, 1)
+        res |= self.check_line(pos & legal, ob, self.rshift, 1)
         
         ob = self.vertical & self.ob
 
         #上に返る石を求める
-        res |= self.check_line(pos, ob, self.lshift, 8)
+        legal = self.check_line(self.pb, ob, self.rshift, 8)
+        legal = blank_board & self.rshift(legal, 8)
+        res |= self.check_line(pos & legal, ob, self.lshift, 8)
         
         #下に返る石を求める
-        res |= self.check_line(pos, ob, self.rshift, 8)
+        legal = self.check_line(self.pb, ob, self.lshift, 8)
+        legal = blank_board & self.lshift(legal, 8)
+        res |= self.check_line(pos & legal, ob, self.rshift, 8)
 
         ob= self.diagonal & self.ob
 
         #左上に返る石を求める
-        res |= self.check_line(pos, ob, self.lshift, 9)
+        legal = self.check_line(self.pb, ob, self.rshift, 9)
+        legal = blank_board & self.rshift(legal, 9)
+        res |= self.check_line(pos & legal, ob, self.lshift, 9)
 
-        #左下に返る石を求める
-        res |= self.check_line(pos, ob, self.rshift, 7)
+        #
+        legal = self.check_line(self.pb, ob, self.lshift, 7)
+        legal = blank_board & self.lshift(legal, 7)
+        res |= self.check_line(pos & legal, ob, self.rshift, 7)
 
         #右上に返る石を求める
-        res |= self.check_line(pos, ob, self.lshift, 7)
+        legal = self.check_line(self.pb, ob, self.rshift, 7)
+        legal = blank_board & self.rshift(legal, 7)
+        res |= self.check_line(pos & legal, ob, self.lshift, 7)
         
         #右下に返る石を求める
-        res |= self.check_line(pos, ob, self.rshift, 9)
+        legal = self.check_line(self.pb, ob, self.lshift, 9)
+        legal = blank_board & self.lshift(legal, 9)
+        res |= self.check_line(pos & legal, ob, self.rshift, 9)
         
         return res
     
