@@ -1,22 +1,24 @@
 from globalvar import *
 
 class Board:
-    def __init__(self, color):
+    def __init__(self):
         self.pb = INIT_BLACK_BOARD            # 打ちての盤面
         self.ob = INIT_WHITE_BOARD            # 相手の盤面
         self.turn = BLACK                     # 手番
         self.player_score = 2                 # プレイヤーの石の数
         self.com_score = 2                    # コンピュータの石の数
-        self.player_color = color             # プレイヤーの色
-        self.com_color = color * -1           # コンピュータの色
-        self.pre_pos = 0                      #　前回の手
+        self.player_color = None              # プレイヤーの色
+        self.com_color = None                 # コンピュータの色
+        self.pre_pos = 0                      # 前回の手
    
     def init(self):
-        self.pb = INIT_BLACK_BOARD            # 打ちての盤面
-        self.ob = INIT_WHITE_BOARD            # 相手の盤面
-        self.turn = BLACK                     # 手番
-        self.black = 2                        # 黒の石の数
-        self.white = 2                        # 白の石の数
+        self.pb = INIT_BLACK_BOARD
+        self.ob = INIT_WHITE_BOARD
+        self.turn = BLACK
+        self.player_score = 2
+        self.com_score = 2
+        self.player_color = None
+        self.com_color = None          
 
     def blank(self):
         """
