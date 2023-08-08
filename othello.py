@@ -139,9 +139,9 @@ class Othello():
             w = i - h * SIZE
             h *= mass_size
             w *= mass_size
-            self.canvas.create_rectangle(w, h, w + mass_size, h + mass_size, fill="green", tags=f"mass_{i}", outline="black")
+            self.canvas.create_rectangle(w, h, w + mass_size, h + mass_size, fill="green", tags=f"mass_{i}", outline="black", activefill="spring green", activestipple="gray25")
             if i == 19 or i == 26 or i == 37 or i == 44:
-                self.canvas.itemconfig(f"mass_{i}", fill="spring green", stipple="gray25")
+                self.canvas.itemconfig(f"mass_{i}", fill="green yellow", stipple="gray25")
             self.canvas.create_oval(w, h, w + mass_size, h + mass_size, fill="black", tags=f"stone_{i}", width=0, state=tk.HIDDEN) 
             self.canvas.scale(f"stone_{i}", w + mass_size / 2, h + mass_size / 2, 0.8, 0.8 )
             if i == 27 or i == 36:
@@ -154,7 +154,7 @@ class Othello():
         legal = self.board.legal_board(self.board.ob, self.board.pb)
         for i in range(SIZE * SIZE):
             if legal & (0x8000000000000000 >> i):
-                self.canvas.itemconfig(f"mass_{i}", fill="spring green", stipple="gray25")
+                self.canvas.itemconfig(f"mass_{i}", fill="green yellow", stipple="gray25")
             else:
                 self.canvas.itemconfig(f"mass_{i}", fill="green")
             pcolor, ocolor = ("black", "white") if self.board.turn == BLACK else ("white", "black")
@@ -180,6 +180,7 @@ class Othello():
             massage = "勝者:白！"
         else:
             massage = "引き分け！"
+        self.canvas["state"] = tk.DISABLED
         messagebox.showinfo(
             title="結果",
             message=f"ゲーム終了！\n{COLOR[self.board.player_color]}{self.board.player_score}:\
