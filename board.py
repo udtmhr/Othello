@@ -57,41 +57,41 @@ class Board:
 
         blank_board = self.blank()   # 空きマスが１のボード
         
-        mask = 0x7e7e7e7e7e7e7e7e & ob  # 左右の番人
+        mask = 0x7e7e7e7e7e7e7e7e & ob  # 左右のつながりを絶つ
 
-        #左
+        #左に連続する場所を求める
         res = self.check_line(pb, mask, self.lshift, 1)
         legal_board = self.lshift(res, 1)
 
-        #右
+        #に連続する場所を求める
         res = self.check_line(pb, mask, self.rshift, 1)
         legal_board |=  self.rshift(res, 1)  
 
-        mask = 0x00FFFFFFFFFFFF00 & ob    # 上下の番人
+        mask = 0x00FFFFFFFFFFFF00 & ob    # 上下のつながりを絶つ
 
-        #下
+        #下に連続する場所を求める
         res = self.check_line(pb, mask, self.rshift, 8)
         legal_board |= self.rshift(res, 8)
 
-        #上
+        #上に連続する場所を求める
         res = self.check_line(pb, mask, self.lshift, 8)
         legal_board |= self.lshift(res, 8)
 
-        mask = ob & 0x007e7e7e7e7e7e00    #  全辺の番人
+        mask = ob & 0x007e7e7e7e7e7e00    #  全辺のつながりを絶つ
 
-        #左上
+        #左上に連続する場所を求める
         res = self.check_line(pb, mask, self.lshift, 9)
         legal_board |=  self.lshift(res, 9)
 
-        #左下
+        #左下に連続する場所を求める
         res = self.check_line(pb, mask, self.rshift, 7)
         legal_board |=  self.rshift(res, 7)
 
-        #右上
+        #右上に連続する場所を求める
         res = self.check_line(pb, mask, self.lshift, 7)
         legal_board |= self.lshift(res, 7)
 
-        #右下
+        #右下に連続する場所を求める
         res = self.check_line(pb, mask, self.rshift, 9)
         legal_board |=  self.rshift(res, 9)
 
@@ -156,8 +156,8 @@ class Board:
         おける場所か判断する関数
         おけるならtrue
         """
-        legal = self.legal_board(self.pb, self.ob)
-        return (pos & legal == pos)
+        
+        return (pos & self.legal_board(self.pb, self.ob) == pos)
     
     def put(self, pos, rev):
         """
@@ -190,15 +190,13 @@ class Board:
         return 2                                  # 終局
     
     def change_turn(self):
+        """
+        手番を交代する関数
+        """
+        # 手番の色の入れ替え
         self.turn *= -1
+
+        #ボードの入れ替え
         self.pb ^= self.ob
         self.ob ^= self.pb
         self.pb ^= self.ob
-        
-if __name__ == "__main__":
-
-    def print_board(board):
-        import numpy as np
-        board = format(board, "064b")
-        board = np.reshape(np.array(list(board), dtype=int), (8, 8))
-        print(board)
