@@ -2,7 +2,9 @@ import numpy as np
 from globalvar import SIZE, EMPTY, WHITE, BLACK
 
 class Com:
-    weight = [2, 5, 1] # bp, sd, cn
+    weight = [2, 5, 1]  # 位置による評価の重み, 確定石による評価の重み, 合法手による評価の重み
+
+    # 評価用ボード
     eval_board = np.array([[45, -11, 4, -1, -1, 4, -11, 45],
                               [-11, -26, -1, -3, -3, -1, -16, -11],
                               [4, -1, 2, -1, -1, 2, -1, 4],
@@ -11,7 +13,7 @@ class Com:
                               [4, -1, 2, -1, -1, 2, -1, 4],
                               [-11, -26, -1, -3, -3, -1, -16, -11],
                               [45, -11, 4, -1, -1, 4, -11, 45]],
-                              dtype=int)
+                              dtype=np.int64)
     
     def __init__(self, board, d=3):
         self.d = d
@@ -22,7 +24,7 @@ class Com:
         位置による評価の合計を返す
         """
 
-        board_arr = np.array(list(bin(self.board.pb)[2:].zfill(64)), dtype=int)
+        board_arr = np.array(list(bin(self.board.pb)[2:].zfill(64)), dtype=int)  # ビットボードを配列に直す
         board_arr = np.reshape(board_arr, (SIZE, SIZE))
         return np.sum(board_arr * Com.eval_board * 3)
     
@@ -113,9 +115,15 @@ class Com:
         return Com.weight[0] * bp + Com.weight[1] * sd + Com.weight[2] * cn
     
     def final_eval(self):
+        """
+        決着がついた時の評価関数
+        """
         return (self.board.pb.bit_count() - self.board.ob.bit_count()) * 100
     
     def nega_alpha(self, depth, alpha, beta):
+        """
+        ネガアルファ法
+        """
         if depth == 0:
             return self.mid_eval()
         
@@ -144,7 +152,7 @@ class Com:
             self.board.change_turn()
         
         return alpha
-                
+
     def search(self, depth):
         best_pos = None
         best_value = float("-inf")
@@ -162,10 +170,3 @@ class Com:
             self.board.put(pos, rev)
             plb ^= pos
         return best_pos
-
-if __name__ == "__main__":
-    from board import Board
-    board = Board()
-    arr = np.array(list(bin(board.pb)[2:].zfill(64)), dtype=int)
-    print(arr)
-    

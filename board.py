@@ -1,4 +1,6 @@
+from numba.experimental import jitclass
 from globalvar import *
+
 
 class Board:
     def __init__(self):
@@ -7,8 +9,8 @@ class Board:
         self.turn = BLACK                     # 手番
         self.player_score = 2                 # プレイヤーの石の数
         self.com_score = 2                    # コンピュータの石の数
-        self.player_color = None              # プレイヤーの色
-        self.com_color = None                 # コンピュータの色
+        self.player_color = 0                 # プレイヤーの色
+        self.com_color = 0                    # コンピュータの色
         self.pre_pos = 0                      # 前回の手
    
     def init(self):
@@ -17,8 +19,8 @@ class Board:
         self.turn = BLACK
         self.player_score = 2
         self.com_score = 2
-        self.player_color = None
-        self.com_color = None          
+        self.player_color = 0
+        self.com_color = 0       
 
     def blank(self):
         """
@@ -178,16 +180,14 @@ class Board:
         return b
 
     def next_player(self):
-        olb = self.legal_board(self.ob, self.pb)  # 相手の合法手
-        if olb:                                   # 相手がおける
+        if (olb := self.legal_board(self.ob, self.pb)):  # 相手がおける
             self.change_turn()
-            return 0
+            return olb, 2
         
-        plb = self.legal_board(self.pb, self.ob)  # 自分の合法手
-        if plb:                                   # 相手がパス
-            return 1
+        if (plb := self.legal_board(self.pb, self.ob)):  # 相手がパス
+            return plb, 1
         
-        return 2                                  # 終局
+        return 0, 0                                      # 終局
     
     def change_turn(self):
         """

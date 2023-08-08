@@ -15,8 +15,6 @@ class Othello():
         super().__init__()
         self.board = Board()
         self.com = Com(self.board)
-        self.click_interval = 1000
-        self.last_click_time = 0
 
         self.create_root()
         self.create_menu()
@@ -116,7 +114,7 @@ class Othello():
         menu.add_cascade(label="難易度", menu=diff)
         diff.add_radiobutton(label="簡単", command=lambda: self.select_com(1))
         diff.add_radiobutton(label="普通", command=lambda: self.select_com(3))
-        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(6))
+        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(7))
 
         rematch = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="再戦", menu=rematch)
@@ -149,9 +147,7 @@ class Othello():
             elif i == 28 or i == 35:
                 self.canvas.itemconfig(f"stone_{i}", state=tk.NORMAL)     
        
-    def disp_board(self):
-        mass_size = CANVAS_SIZE / SIZE
-        legal = self.board.legal_board(self.board.ob, self.board.pb)
+    def disp_board(self, legal):
         for i in range(SIZE * SIZE):
             if legal & (0x8000000000000000 >> i):
                 self.canvas.itemconfig(f"mass_{i}", fill="green yellow", stipple="gray25")
@@ -164,11 +160,13 @@ class Othello():
                 self.canvas.itemconfig(f"stone_{i}", fill=ocolor, state=tk.NORMAL)
     
     def next_player(self):
-        if (next := self.board.next_player()) == 0:
-            pass
+        legal, next = self.board.next_player()
+        if next == 2:
+            return legal
         elif next == 1:
             player = COLOR[self.board.turn * -1] 
             messagebox.showinfo(message=f"{player}のおける場所がありません。スキップします。")
+            return legal
         else:
             self.gameset()
             self.board.turn = self.board.player_color
@@ -189,10 +187,10 @@ class Othello():
         )
     
     def change_disp(self):
-        self.disp_board()
+        legal = self.next_player()
+        self.disp_board(legal)
         self.var_lst[self.board.player_color].set(f"{COLOR[self.board.player_color]}:{self.board.player_score}")
         self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.com_score}")
-        self.next_player()
         self.var_lst[0].set(f"{COLOR[self.board.turn]}の手番")
      
     def select_com(self, d):
@@ -232,7 +230,7 @@ class Othello():
         self.canvas.bind("<Button-1>", self.click)
 
     def start_game(self):
-        if self.board.player_color is None:
+        if self.board.player_color == 0:
             messagebox.showinfo(message="先手か後手を選択してください。")
         else:
             messagebox.showinfo(message="ゲーム開始！")
