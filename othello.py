@@ -15,6 +15,8 @@ class Othello():
         super().__init__()
         self.board = Board()
         self.com = Com(self.board)
+        self.click_interval = 1000
+        self.last_click_time = 0
 
         self.create_root()
         self.create_menu()
@@ -196,21 +198,23 @@ class Othello():
         self.com = Com(self.board, d)
     
     def com_turn(self):
-            pos = self.com.search(self.com.d)
-            rev = self.board.reverse(pos)
-            self.board.put(pos, rev)
-            self.board.com_score = self.board.pb.bit_count()
-            self.board.player_score = self.board.ob.bit_count()
-            self.change_disp()
-            if self.board.turn == self.board.com_color:
-                self.canvas.after(1000, self.com_turn)
+        pos = self.com.search(self.com.d)
+        rev = self.board.reverse(pos)
+        self.board.put(pos, rev)
+        self.board.com_score = self.board.pb.bit_count()
+        self.board.player_score = self.board.ob.bit_count()
+        self.change_disp()
+        if self.board.turn == self.board.com_color:
+            self.canvas.after(1000, self.com_turn)
+        else:
+            self.canvas["state"] = tk.NORMAL
     
     def click(self, event):
         mass_size = CANVAS_SIZE / SIZE
         x = int(event.x / mass_size)
         y = int(event.y / mass_size)
         pos = self.board.to_bin(x, y)
-        if self.board.check_put(pos):
+        if self.board.check_put(pos) and self.canvas["state"] == tk.NORMAL:
             self.canvas["state"] = tk.DISABLED
             rev = self.board.reverse(pos)
             self.board.put(pos, rev)
@@ -218,9 +222,10 @@ class Othello():
             self.board.com_score = self.board.ob.bit_count()
             self.change_disp()
 
-        if self.board.turn == self.board.com_color:
-            self.canvas.after(1000, self.com_turn)
-        self.canvas["state"] = tk.NORMAL
+            if self.board.turn == self.board.com_color:
+                self.canvas.after(1000, self.com_turn)
+            else:
+                self.canvas["state"] = tk.NORMAL
 
     def event(self):
         self.canvas.bind("<Button-1>", self.click)
@@ -232,11 +237,13 @@ class Othello():
             messagebox.showinfo(message="ゲーム開始！")
             if self.board.player_color == WHITE:
                 self.canvas.after(500, self.com_turn())
+            else:
+                self.canvas["state"] = tk.NORMAL
             self.event()
-            #self.canvas["state"] = tk.NORMAL
 
     def rematch(self):
         self.canvas.delete("all")
+        self.canvas["state"] = tk.DISABLED
         self.init_board()
         self.board.init()
         self.start_game()
