@@ -62,14 +62,14 @@ class Othello():
         frame_widget.propagate(False)
         frame_widget.pack(side=tk.LEFT)
 
-        start_button = tk.Button(
+        self.start_button = tk.Button(
             frame_widget,
             text="ゲーム開始",
             width=10, 
             height=2,
             font=("MEゴシック", "20", "bold"),
             relief="raised",
-            command=self.start_game
+            command=self.start_game,
         )
 
         black_var = tk.StringVar(frame_widget)
@@ -104,7 +104,7 @@ class Othello():
 
         white_label.place(x=50, y=10)
         turn_label.place(x=0, y=200)
-        start_button.place(x=12, y=350)
+        self.start_button.place(x=12, y=350)
         black_label.place(x=50, y=570)
 
         self.var_lst = [turn_var, black_var, white_var]
@@ -235,6 +235,7 @@ class Othello():
             messagebox.showinfo(message="先手か後手を選択してください。")
         else:
             messagebox.showinfo(message="ゲーム開始！")
+            self.start_button["state"] = tk.DISABLED
             if self.board.player_color == WHITE:
                 self.canvas.after(500, self.com_turn())
             else:
@@ -244,10 +245,9 @@ class Othello():
     def rematch(self):
         self.canvas.delete("all")
         self.canvas["state"] = tk.DISABLED
+        self.start_button["state"] = tk.NORMAL
         self.init_board()
         self.board.init()
-        self.start_game()
-        
 
 if __name__ == "__main__":
     othello = Othello()
