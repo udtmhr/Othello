@@ -182,12 +182,12 @@ class Board:
     def next_player(self):
         if (olb := self.legal_board(self.ob, self.pb)):  # 相手がおける
             self.change_turn()
-            return olb, 2
+            return 2
         
         if (plb := self.legal_board(self.pb, self.ob)):  # 相手がパス
-            return plb, 1
+            return 1
         
-        return 0, 0                                      # 終局
+        return 0                                         # 終局
     
     def change_turn(self):
         """
