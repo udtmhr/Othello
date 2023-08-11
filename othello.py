@@ -114,7 +114,7 @@ class Othello():
         menu.add_cascade(label="難易度", menu=diff)
         diff.add_radiobutton(label="簡単", command=lambda: self.select_com(1))
         diff.add_radiobutton(label="普通", command=lambda: self.select_com(3))
-        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(7))
+        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(6))
 
         rematch = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="再戦", menu=rematch)
@@ -147,7 +147,8 @@ class Othello():
             elif i == 28 or i == 35:
                 self.canvas.itemconfig(f"stone_{i}", state=tk.NORMAL)     
        
-    def disp_board(self, legal):
+    def disp_board(self):
+        legal = self.board.legal_board(self.board.ob, self.board.pb)
         for i in range(SIZE * SIZE):
             if legal & (0x8000000000000000 >> i):
                 self.canvas.itemconfig(f"mass_{i}", fill="green yellow", stipple="gray25")
@@ -160,13 +161,12 @@ class Othello():
                 self.canvas.itemconfig(f"stone_{i}", fill=ocolor, state=tk.NORMAL)
     
     def next_player(self):
-        legal, next = self.board.next_player()
+        next = self.board.next_player()
         if next == 2:
-            return legal
+            pass
         elif next == 1:
             player = COLOR[self.board.turn * -1] 
             messagebox.showinfo(message=f"{player}のおける場所がありません。スキップします。")
-            return legal
         else:
             self.gameset()
             self.board.turn = self.board.player_color
@@ -187,8 +187,8 @@ class Othello():
         )
     
     def change_disp(self):
-        legal = self.next_player()
-        self.disp_board(legal)
+        self.disp_board()
+        self.next_player()
         self.var_lst[self.board.player_color].set(f"{COLOR[self.board.player_color]}:{self.board.player_score}")
         self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.com_score}")
         self.var_lst[0].set(f"{COLOR[self.board.turn]}の手番")
