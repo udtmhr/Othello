@@ -173,24 +173,24 @@ class Othello():
         
     def gameset(self):
         if self.board.player_score > self.board.com_score:
-            massage = "勝者:黒！"
+            massage = f"勝者:{COLOR[self.board.player_color]}!"
         elif self.board.player_score < self.board.com_score:
-            massage = "勝者:白！"
+            massage = f"勝者:{COLOR[self.board.com_color]}!"
         else:
             massage = "引き分け！"
         self.canvas["state"] = tk.DISABLED
         messagebox.showinfo(
             title="結果",
-            message=f"ゲーム終了！\n{COLOR[self.board.player_color]}{self.board.player_score}:\
-            {COLOR[self.board.com_color]}{self.board.com_score}\
-            {massage}"
+            message=f"ゲーム終了！\n{COLOR[self.board.player_color]}{self.board.player_score}:"\
+            f"{COLOR[self.board.com_color]}{self.board.com_score}\n"\
+            f"{massage}"
         )
     
     def change_disp(self):
         self.disp_board()
-        self.next_player()
         self.var_lst[self.board.player_color].set(f"{COLOR[self.board.player_color]}:{self.board.player_score}")
         self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.com_score}")
+        self.next_player()
         self.var_lst[0].set(f"{COLOR[self.board.turn]}の手番")
      
     def select_com(self, d):
