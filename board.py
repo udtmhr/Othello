@@ -1,6 +1,11 @@
 from numba.experimental import jitclass
 from globalvar import *
 
+SIZE = 8
+WHITE = -1
+BLACK = 1
+INIT_BLACK_BOARD = 0x0000000810000000
+INIT_WHITE_BOARD = 0x0000001008000000
 
 class Board:
     def __init__(self):
