@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from board import Board
+from board import Board, SIZE, BLACK, WHITE
 from computer import Com
-from globalvar import *
 
 WIDTH = 840
 HEIGHT = 640
