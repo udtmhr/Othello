@@ -1,6 +1,3 @@
-from numba.experimental import jitclass
-from globalvar import *
-
 SIZE = 8
 WHITE = -1
 BLACK = 1
