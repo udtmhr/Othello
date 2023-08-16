@@ -1,3 +1,6 @@
+import numpy as np
+
+
 SIZE = 8
 WHITE = -1
 BLACK = 1
@@ -202,3 +205,6 @@ class Board:
         self.pb ^= self.ob
         self.ob ^= self.pb
         self.pb ^= self.ob
+    
+    def to_array(self, board):
+        return np.array(list(bin(self.board.pb)[2:].zfill(64)), dtype=np.uint8).reshape((8, 8))
