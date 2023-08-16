@@ -207,4 +207,4 @@ class Board:
         self.pb ^= self.ob
     
     def to_array(self, board):
-        return np.array(list(bin(self.board.pb)[2:].zfill(64)), dtype=np.uint8).reshape((8, 8))
+        return np.array(list(bin(board)[2:].zfill(64)), dtype=np.uint8).reshape((8, 8))
