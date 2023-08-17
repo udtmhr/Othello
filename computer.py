@@ -15,7 +15,7 @@ class Com:
                               [45, -11, 4, -1, -1, 4, -11, 45]],
                               dtype=np.int64)
     
-    def __init__(self, board, d=3):
+    def __init__(self, board, d):
         self.d = d
         self.board = board
     
@@ -153,7 +153,7 @@ class Com:
         
         return alpha
 
-    def search(self, depth):
+    def search(self):
         best_pos = None
         best_value = float("-inf")
         plb = self.board.legal_board(self.board.pb, self.board.ob)
@@ -162,7 +162,7 @@ class Com:
             rev = self.board.reverse(pos)
             self.board.put(pos, rev)
             self.board.change_turn()
-            value = -self.nega_alpha(depth - 1, -float("inf"), -best_value)
+            value = -self.nega_alpha(self.d - 1, -float("inf"), -best_value)
             if value > best_value:
                 best_value = value
                 best_pos = pos
