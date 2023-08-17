@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from board import Board, SIZE, BLACK, WHITE
 from computer import Com
+from CNN_com import CNNCom
 
 WIDTH = 840
 HEIGHT = 640
@@ -13,7 +14,7 @@ class Othello():
     def __init__(self):
         super().__init__()
         self.board = Board()
-        self.com = Com(self.board)
+        self.com = None
 
         self.create_root()
         self.create_menu()
@@ -114,6 +115,7 @@ class Othello():
         diff.add_radiobutton(label="簡単", command=lambda: self.select_com(1))
         diff.add_radiobutton(label="普通", command=lambda: self.select_com(3))
         diff.add_radiobutton(label="難しい", command=lambda: self.select_com(6))
+        diff.add_radiobutton(label="最難", command=lambda: self.select_com(0))
 
         rematch = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="再戦", menu=rematch)
@@ -129,6 +131,12 @@ class Othello():
         self.board.player_color = color
         self.board.com_color = color * -1
 
+    def select_com(self, d):
+        if d:
+            self.com = Com(self.board, d)
+        else:
+            self.com = CNNCom(self.board)
+        
     def init_board(self):
         mass_size = CANVAS_SIZE / SIZE
         for i in range(SIZE * SIZE):
@@ -191,12 +199,9 @@ class Othello():
         self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.com_score}")
         self.next_player()
         self.var_lst[0].set(f"{COLOR[self.board.turn]}の手番")
-     
-    def select_com(self, d):
-        self.com = Com(self.board, d)
     
     def com_turn(self):
-        pos = self.com.search(self.com.d)
+        pos = self.com.search()
         rev = self.board.reverse(pos)
         self.board.put(pos, rev)
         self.board.com_score = self.board.pb.bit_count()
@@ -229,8 +234,8 @@ class Othello():
         self.canvas.bind("<Button-1>", self.click)
 
     def start_game(self):
-        if self.board.player_color == 0:
-            messagebox.showinfo(message="先手か後手を選択してください。")
+        if self.board.player_color == 0 or self.com is None:
+            messagebox.showinfo(message="先手か後手、難易度を選択してください。")
         else:
             messagebox.showinfo(message="ゲーム開始！")
             self.start_button["state"] = tk.DISABLED
