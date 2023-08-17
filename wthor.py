@@ -1,6 +1,7 @@
 import os
 import csv
 
+
 CODING = "iso-8859-2"
 
 class Wthor:
@@ -22,7 +23,7 @@ class Wthor:
                     "black_score": int.from_bytes(file.read(1), "little"),
                     "depth": header["depth"],
                     "theoretical_score": int.from_bytes(file.read(1), "little"),
-                    "recod": self.get_recode(file)
+                    "record": self.get_recode(file)
                 })
         return data
     
@@ -30,7 +31,7 @@ class Wthor:
         data = []
         with open(filepath, "rb") as file:
             header = self.get_header(file)
-            for _ in range(header["recods"]):
+            for _ in range(header["records"]):
                 data.append(file.read(byte).decode(CODING).replace("\x00", ""))
         return data
     
@@ -38,7 +39,7 @@ class Wthor:
         return {
             "created_date": self.create_date(file),
             "game_count": int.from_bytes(file.read(4), byteorder="little"),
-            "recods": int.from_bytes(file.read(2), byteorder="little"),
+            "records": int.from_bytes(file.read(2), byteorder="little"),
             "game_year": int.from_bytes(file.read(2), byteorder="little"),
             "size": int.from_bytes(file.read(1), byteorder="little"),
             "type": int.from_bytes(file.read(1), byteorder="little"),
@@ -62,27 +63,25 @@ class Wthor:
         return recode
     
     def to_csv(self, filename, mode="w"):
-        header = ["game_year", "tournament", "black_player", "white_player", "black_score", "depth", "theoretical_score", "recod"]
+        header = ["game_year", "tournament", "black_player", "white_player", "black_score", "depth", "theoretical_score", "record"]
         with open(filename, mode, newline="", encoding="utf-8") as file:
             writer = csv.DictWriter(file, header)
             writer.writeheader()
             writer.writerows(self.game_datas)
-        
-if __name__ == "__main__":
-    load_folder_path = "wthor"
-    add_folder_path = "wthor_csv"
-    files = os.listdir(load_folder_path)
-    jou = os.path.join(load_folder_path, files[0])
-    trn = os.path.join(load_folder_path, files[1])
-    print(jou)
-    print(trn)
-    for wtb in files[2:]:
-        print(wtb, end=" ")
-        try:
-            wthor = Wthor(os.path.join(load_folder_path, wtb), jou, trn)
-            filename = os.path.splitext(wtb)[0] + ".csv"
-            wthor.to_csv(os.path.join(add_folder_path, filename))
-            print("success")
-        except ValueError as e:
-            print(e)
+    
+#if __name__ == "__main__":
+    # load_folder_path = "wthor"
+    # add_folder_path = "wthor_csv"
+    # files = os.listdir(load_folder_path)
+    # jou = os.path.join(load_folder_path, files[0])
+    # trn = os.path.join(load_folder_path, files[1])
+    # for wtb in files[2:]:
+    #     print(wtb, end=" ")
+    #     try:
+    #         wthor = Wthor(os.path.join(load_folder_path, wtb), jou, trn)
+    #         filename = os.path.splitext(wtb)[0] + ".csv"
+    #         wthor.to_csv(os.path.join(add_folder_path, filename))
+    #         print("success")
+    #     except ValueError as e:
+    #         print(e)
     
