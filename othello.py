@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from board import Board, SIZE, BLACK, WHITE
-from computer import Com
-from CNN_com import CNNCom
+from board_env import Othello
+from player.computer import Com
+from player.CNN_com import CNNCom
+from player.mcs import MCS, MCTS
+
 
 WIDTH = 840
 HEIGHT = 640
@@ -10,10 +13,9 @@ CANVAS_SIZE = 640
 FONT = ("MEゴシック", "35", "bold")
 COLOR = {BLACK: "黒", WHITE: "白"}
 
-class Othello():
+class OthelloApp:
     def __init__(self):
-        super().__init__()
-        self.board = Board()
+        self.board = Othello()
         self.com = None
 
         self.create_root()
@@ -112,9 +114,10 @@ class Othello():
         self.root.config(menu=menu)
         diff = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="難易度", menu=diff)
-        diff.add_radiobutton(label="簡単", command=lambda: self.select_com(1))
-        diff.add_radiobutton(label="普通", command=lambda: self.select_com(3))
-        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(6))
+        diff.add_radiobutton(label="超簡単", command=lambda: self.select_com(1))
+        diff.add_radiobutton(label="簡単", command=lambda: self.select_com(3))
+        diff.add_radiobutton(label="普通", command=lambda: self.select_com(6))
+        diff.add_radiobutton(label="難しい", command=lambda: self.select_com(-1))
         diff.add_radiobutton(label="最難", command=lambda: self.select_com(0))
 
         rematch = tk.Menu(self.root, tearoff=False)
@@ -123,16 +126,13 @@ class Othello():
 
         color = tk.Menu(self.root, tearoff=False)
         menu.add_cascade(label="手番", menu=color)
-        color.add_radiobutton(label="先手", command=lambda: self.select_color(BLACK))
-        color.add_radiobutton(label="後手", command=lambda: self.select_color(WHITE))
-        
-    
-    def select_color(self, color):
-        self.board.player_color = color
-        self.board.com_color = color * -1
+        color.add_radiobutton(label="先手", command=lambda: self.board.set_color(BLACK))
+        color.add_radiobutton(label="後手", command=lambda: self.board.set_color(WHITE))
 
     def select_com(self, d):
-        if d:
+        if d == -1:
+            self.com = MCTS(self.board, 1000, 50)
+        elif d:
             self.com = Com(self.board, d)
         else:
             self.com = CNNCom(self.board)
@@ -154,49 +154,46 @@ class Othello():
             elif i == 28 or i == 35:
                 self.canvas.itemconfig(f"stone_{i}", state=tk.NORMAL)     
        
-    def disp_board(self):
+    def update_board(self):
         legal = self.board.legal_board(self.board.ob, self.board.pb)
         for i in range(SIZE * SIZE):
-            if legal & (0x8000000000000000 >> i):
+            mask = 0x8000000000000000 >> i
+            if legal & mask:
                 self.canvas.itemconfig(f"mass_{i}", fill="green yellow", stipple="gray25")
             else:
                 self.canvas.itemconfig(f"mass_{i}", fill="green")
-            pcolor, ocolor = ("black", "white") if self.board.turn == BLACK else ("white", "black")
-            if self.board.pb & (0x8000000000000000 >> i):
-                self.canvas.itemconfig(f"stone_{i}", fill=pcolor, state=tk.NORMAL)
-            elif self.board.ob & (0x8000000000000000 >> i):
-                self.canvas.itemconfig(f"stone_{i}", fill=ocolor, state=tk.NORMAL)
+            colors = ["", "black", "white"]
+            if self.board.pb & mask:
+                self.canvas.itemconfig(f"stone_{i}", fill=colors[self.board.turn], state=tk.NORMAL)
+            elif self.board.ob & mask:
+                self.canvas.itemconfig(f"stone_{i}", fill=colors[self.board.turn * -1], state=tk.NORMAL)
     
     def next_player(self):
-        next = self.board.next_player()
-        if next == 2:
-            pass
-        elif next == 1:
-            player = COLOR[self.board.turn * -1] 
-            messagebox.showinfo(message=f"{player}のおける場所がありません。スキップします。")
+        if (next_player := self.board.next_player()) == self.board.turn * -1:
+            self.board.change_turn()        
+        elif next_player == self.board.turn:
+            messagebox.showinfo(message=f"{COLOR[self.board.turn * -1]}のおける場所がありません。スキップします。")
         else:
             self.gameset()
             self.board.turn = self.board.player_color
-        
+
     def gameset(self):
-        if self.board.player_score > self.board.com_score:
-            massage = f"勝者:{COLOR[self.board.player_color]}!"
-        elif self.board.player_score < self.board.com_score:
-            massage = f"勝者:{COLOR[self.board.com_color]}!"
+        if (winner := self.board.get_winner()):
+            massage = f"勝者:{COLOR[winner]}!"
         else:
             massage = "引き分け！"
         self.canvas["state"] = tk.DISABLED
         messagebox.showinfo(
             title="結果",
-            message=f"ゲーム終了！\n{COLOR[self.board.player_color]}{self.board.player_score}:"\
-            f"{COLOR[self.board.com_color]}{self.board.com_score}\n"\
+            message=f"ゲーム終了！\n黒　{self.board.score[BLACK]}:"\
+            f"白{self.board.score[WHITE]}\n"\
             f"{massage}"
         )
     
-    def change_disp(self):
-        self.disp_board()
-        self.var_lst[self.board.player_color].set(f"{COLOR[self.board.player_color]}:{self.board.player_score}")
-        self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.com_score}")
+    def update_disp(self):
+        self.update_board()
+        self.var_lst[self.board.player_color].set(f"{COLOR[self.board.player_color]}:{self.board.score[self.board.player_color]}")
+        self.var_lst[self.board.com_color].set(f"{COLOR[self.board.com_color]}:{self.board.score[self.board.com_color]}")
         self.next_player()
         self.var_lst[0].set(f"{COLOR[self.board.turn]}の手番")
     
@@ -204,11 +201,9 @@ class Othello():
         pos = self.com.search()
         rev = self.board.reverse(pos)
         self.board.put(pos, rev)
-        self.board.com_score = self.board.pb.bit_count()
-        self.board.player_score = self.board.ob.bit_count()
-        self.change_disp()
+        self.update_disp()
         if self.board.turn == self.board.com_color:
-            self.canvas.after(1000, self.com_turn)
+            self.canvas.after(1500, self.com_turn)
         else:
             self.canvas["state"] = tk.NORMAL
     
@@ -221,9 +216,7 @@ class Othello():
             self.canvas["state"] = tk.DISABLED
             rev = self.board.reverse(pos)
             self.board.put(pos, rev)
-            self.board.player_score = self.board.pb.bit_count()
-            self.board.com_score = self.board.ob.bit_count()
-            self.change_disp()
+            self.update_disp()
 
             if self.board.turn == self.board.com_color:
                 self.canvas.after(1000, self.com_turn)
@@ -250,9 +243,9 @@ class Othello():
         self.canvas["state"] = tk.DISABLED
         self.start_button["state"] = tk.NORMAL
         self.init_board()
-        self.board.init()
+        self.board.__init__()
 
 if __name__ == "__main__":
-    othello = Othello()
+    othello = OthelloApp()
     othello.start_game()
     othello.root.mainloop()
