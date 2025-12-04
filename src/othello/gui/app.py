@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
-from board import Board, SIZE, BLACK, WHITE
-from board_env import Othello
-from player.computer import Com
-from player.CNN_com import CNNCom
-from player.mcs import MCS, MCTS
+from othello.core.board import Board, SIZE, BLACK, WHITE
+from othello.core.game import Othello
+from othello.player.computer import Com
+from othello.player.cnn_com import CNNCom
+from othello.player.mcs import MCS, MCTS
 
 
 WIDTH = 840

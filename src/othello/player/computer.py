@@ -1,5 +1,5 @@
 import numpy as np
-from board import SIZE, WHITE, BLACK
+from othello.core.board import SIZE, WHITE, BLACK
 
 class Com:
     weight = [2, 5, 1]  # 位置による評価の重み, 確定石による評価の重み, 合法手による評価の重み

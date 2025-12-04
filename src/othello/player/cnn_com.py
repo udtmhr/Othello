@@ -14,7 +14,7 @@ class Bias(keras.layers.Layer):
 
 
 class CNNCom:
-    def __init__(self, board, path='model\model-05.h5'):
+    def __init__(self, board, path='models/model-05.h5'):
         self.board = board
         self.path = path
         self.model = self.load_model(path)
@@ -36,7 +36,7 @@ class CNNCom:
 
 
 if __name__ == "__main__":
-    from board import Board
+    from othello.core.board import Board
 
     env = Board()
     cnn = CNNCom(env)

@@ -1,5 +1,5 @@
 import numpy as np
-from board import *
+from othello.core.board import *
 
 class Othello(Board):
     def __init__(self):
